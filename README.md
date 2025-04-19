@@ -8,6 +8,7 @@ This project provides a pre-commit hook for Git that automatically applies ReSha
 - Uses JetBrains CLI tools to apply ReSharper formatting rules
 - Prevents commits if files are reformatted, requiring you to review and stage the changes
 - Supports nested `.DotSettings` files in different directories
+- Cross-platform compatible (works on Windows, macOS, and Linux)
 
 ## Prerequisites
 
@@ -20,6 +21,26 @@ dotnet tool install -g JetBrains.ReSharper.GlobalTools
 - `.DotSettings` file(s) in your project
 
 ## Installation
+
+### Option 1: Using the Installation Script (Recommended)
+
+1. Make the installation script executable:
+```bash
+chmod +x install.sh
+```
+
+2. Run the script with your project directory as an argument:
+```bash
+./install.sh /path/to/your/project
+```
+
+The script will:
+- Check if JetBrains CLI tools are installed and install them if needed
+- Verify the project directory is a valid git repository
+- Copy the pre-commit hook to the correct location
+- Set the proper permissions
+
+### Option 2: Manual Installation
 
 1. Copy the `pre-commit` file to your project's `.git/hooks` directory:
 

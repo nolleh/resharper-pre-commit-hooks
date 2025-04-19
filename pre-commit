@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=d)
+MODIFIED_FILES=()
+
+for FILE in $STAGED_FILES; do
+  DIR=$(dirname "$FILE")
+
+  CURRENT_DIR="$DIR"
+  DOT_SETTINGS=""
+
+  while [ "$CURRENT_DIR" != "." ] && [ "$CURRENT_DIR" != "/" ]; do
+    for ds_file in "$CURRENT_DIR"/*.DotSettings; do
+      if [ -f "$ds_file" ]; then
+        DOT_SETTINGS="$ds_file"
+        break 2
+      fi
+    done
+    CURRENT_DIR=$(dirname "$CURRENT_DIR")
+  done
+
+  if [ -z "$DOT_SETTINGS" ]; then
+    for ds_file in ./*.DotSettings; do
+      if [ -f "$ds_file" ]; then
+        DOT_SETTINGS="$ds_file"
+        break
+      fi
+    done
+  fi
+
+  if [ -n "$DOT_SETTINGS" ]; then
+    echo "Applying $DOT_SETTINGS to $FILE"
+
+    TEMP_FILE=$(mktemp)
+    cp "$FILE" "$TEMP_FILE"
+
+    jb cleanupcode --profile="Built-in: Reformat code" --settings="$DOT_SETTINGS" "$FILE"
+
+    if ! cmp -s "$FILE" "$TEMP_FILE"; then
+      MODIFIED_FILES+=("$FILE")
+    fi
+
+    rm "$TEMP_FILE"
+  else
+    echo "Warning: No .DotSettings file found for $FILE"
+  fi
+done
+
+if [ ${#MODIFIED_FILES[@]} -ne 0 ]; then
+  echo "Reformatted: "
+  printf '%s\n' "${MODIFIED_FILES[@]}"
+  exit 1
+fi

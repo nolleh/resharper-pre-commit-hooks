@@ -3,7 +3,19 @@
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=d)
 MODIFIED_FILES=()
 
+# ReSharper supported file extensions
+# Based on JetBrains ReSharper documentation
+RESHARPER_EXTENSIONS=("cs" "vb" "fs" "cshtml" "vbhtml" "razor" "aspx" "ascx" "master" "config" "xml" "xaml")
+
 for FILE in $STAGED_FILES; do
+	# Get file extension
+	EXTENSION="${FILE##*.}"
+
+	# Skip if file has no extension or extension is not supported by ReSharper
+	if [ "$EXTENSION" = "$FILE" ] || ! [[ " ${RESHARPER_EXTENSIONS[*]} " =~ " ${EXTENSION} " ]]; then
+		continue
+	fi
+
 	DIR=$(dirname "$FILE")
 
 	CURRENT_DIR="$DIR"

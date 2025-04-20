@@ -46,7 +46,7 @@ for FILE in $STAGED_FILES; do
 		TEMP_FILE=$(mktemp)
 		cp "$FILE" "$TEMP_FILE"
 
-		jb cleanupcode --profile="Built-in: Reformat Code" --settings="$DOT_SETTINGS" "$FILE"
+		jb cleanupcode --profile="Built-in: Reformat & Apply Syntax Style" --settings="$DOT_SETTINGS" "$FILE"
 
 		if ! cmp -s "$FILE" "$TEMP_FILE"; then
 			MODIFIED_FILES+=("$FILE")
